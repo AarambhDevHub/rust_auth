@@ -75,7 +75,6 @@ Ensure you have the following tools installed:
 
 Create a `.env` file in the root directory with the following content:
 
-    ```env
     DATABASE_URL=postgres://username:password@localhost/dbname
     JWT_SECRET=your_jwt_secret_key
     JWT_EXPIRATION=60  # JWT expiration time in minutes
@@ -86,9 +85,7 @@ Replace the placeholders with your actual database credentials and desired JWT c
 
 Run the following command to perform database migrations:
 
-    ```bash
     sqlx migrate run
-    ```
 
 This will set up the necessary database schema for the application.
 
@@ -96,10 +93,8 @@ This will set up the necessary database schema for the application.
 
 Start the server using the command:
 
-    ```bash
     cargo run
-    ```
-
+    
 The API will be accessible at http://localhost:8000.
 
 ## API Endpoints
@@ -135,16 +130,6 @@ The custom authentication middleware guards routes by verifying the presence and
 
 In addition to authentication, some routes enforce role-based access control (RBAC) using the `RequireAuth` middleware, which checks user roles like `Admin`, `Moderator`, or `User`.
 
-## Unit Testing
-
-This project includes unit tests to validate various components, especially around authentication logic and database interactions.
-
-To run the tests, execute:
-
-    ```bash
-    cargo test
-    ```
-
 ## OpenAPI Documentation
 
 The project supports OpenAPI 3.0, with schema generation and endpoint documentation provided through the `utoipa` crate.
@@ -155,16 +140,6 @@ The project supports OpenAPI 3.0, with schema generation and endpoint documentat
 - **Register the API Handler as OpenAPI Path:** Each handler is registered as an OpenAPI path with detailed descriptions.
 - **Serving the Swagger UI:** The OpenAPI object is served via a web server, accessible through Swagger UI.
 
-## Contributing
-
-Contributions are welcome! Feel free to open issues or submit pull requests.
-
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/your-feature`).
-3. Commit your changes (`git commit -m 'Add some feature'`).
-4. Push to the branch (`git push origin feature/your-feature`).
-5. Open a pull request.
-
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
@@ -174,6 +149,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 If you find this project useful and would like to support its continued development, you can make a donation via [Buy Me a Coffee](https://buymeacoffee.com/aarambhdevhub).
 
 Thank you for your support!
-
-
-
