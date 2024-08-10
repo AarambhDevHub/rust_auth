@@ -59,6 +59,7 @@ This project showcases how to build a complete authentication system with Rust, 
 ├── .env                   # Environment variables file
 ├── Cargo.toml             # Rust dependencies and project metadata
 ├── README.md              # Project documentation
+```
 
 # Setup Instructions
 
