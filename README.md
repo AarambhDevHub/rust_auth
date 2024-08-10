@@ -1,5 +1,7 @@
 # Rust Authentication API with Actix-Web
 
+[![Thumbnail](https://img.youtube.com/vi/X74uyTr5kk8/0.jpg)](https://youtu.be/X74uyTr5kk8)
+
 This repository contains a comprehensive Rust-based API project using Actix-Web. The API includes robust JWT-based authentication, user management, and Swagger UI integration for interactive API documentation.
 
 ## Table of Contents
