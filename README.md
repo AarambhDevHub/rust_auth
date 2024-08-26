@@ -111,6 +111,9 @@ The API will be accessible at http://localhost:8000.
 
 - **Get Authenticated User:** `GET /api/users/me`
 - **List Users:** `GET /api/users`
+- **Updated User Name:** `PUT /api/users/me/name`
+- **Updated User Role:** `PUT /api/users/me/role`
+- **Updated User Password:** `PUT /api/users/me/password`
 
 Each endpoint is protected by JWT-based authentication, ensuring secure access.
 

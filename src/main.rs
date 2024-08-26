@@ -15,8 +15,7 @@ use config::Config;
 use db::DBClient;
 use dotenv::dotenv;
 use dtos::{
-    FilterUserDto, LoginUserDto, RegisterUserDto, Response, UserData, UserListResponseDto,
-    UserLoginResponseDto, UserResponseDto,
+    FilterUserDto, LoginUserDto, NameUpdateDto, RegisterUserDto, Response, RoleUpdateDto, UserData, UserListResponseDto, UserLoginResponseDto, UserPasswordUpdateDto, UserResponseDto
 };
 use sqlx::postgres::PgPoolOptions;
 use utoipa::{
@@ -38,10 +37,11 @@ pub struct AppState {
 #[derive(OpenApi)]
 #[openapi(
     paths(
-        authHandler::login,authHandler::logout,authHandler::register, users::get_me, users::get_users, heath_checker_handler
+        authHandler::login,authHandler::logout,authHandler::register, users::get_me, users::get_users, heath_checker_handler,
+        users::update_user_name, users::update_user_role, users::update_user_password,
     ),
     components(
-        schemas(UserData,FilterUserDto,LoginUserDto,RegisterUserDto,UserResponseDto,UserLoginResponseDto,Response,UserListResponseDto)
+        schemas(UserData,FilterUserDto,LoginUserDto,RegisterUserDto,UserResponseDto,UserLoginResponseDto,Response,UserListResponseDto, UserPasswordUpdateDto, RoleUpdateDto, NameUpdateDto)
     ),
     tags(
         (name = "Rust Authentication Api", description = "Authentication in Rust API")

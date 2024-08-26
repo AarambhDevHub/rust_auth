@@ -1,9 +1,11 @@
+use core::str;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 use validator::Validate;
 
-use crate::models::User;
+use crate::models::{User, UserRole};
 
 #[derive(Validate, Debug, Default, Clone, Serialize, Deserialize, ToSchema)]
 pub struct RegisterUserDto {
@@ -97,7 +99,7 @@ pub struct UserResponseDto {
 pub struct UserListResponseDto {
     pub status: String,
     pub users: Vec<FilterUserDto>,
-    pub results: usize,
+    pub results: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -110,4 +112,45 @@ pub struct UserLoginResponseDto {
 pub struct Response {
     pub status: &'static str,
     pub message: String,
+}
+
+#[derive(Validate, Debug, Default, Clone, Serialize, Deserialize, ToSchema)]
+pub struct NameUpdateDto {
+    #[validate(length(min = 1, message = "Name is required"))]
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Validate)]
+pub struct RoleUpdateDto {
+    #[validate(custom = "validate_user_role")]
+    pub role: UserRole,
+}
+
+fn validate_user_role(role: &UserRole) -> Result<(), validator::ValidationError> {
+    match role {
+        UserRole::Admin | UserRole::Moderator | UserRole::User => Ok(()),
+        _ => Err(validator::ValidationError::new("invalid_role")),
+    }
+}
+
+#[derive(Debug, Validate, Default, Clone, Serialize, Deserialize, ToSchema)]
+pub struct UserPasswordUpdateDto {
+    #[validate(
+        length(min = 1, message = "New password is required."),
+        length(min = 6, message = "new password must be at least 6 characters")
+    )]
+    pub new_password: String,
+
+    #[validate(
+        length(min = 1, message = "New password confirm is required."),
+        length(min = 6, message = "new password confirm must be at least 6 characters"),
+        must_match(other = "new_password", message="new passwords do not match")
+    )]
+    pub new_password_confirm: String,
+
+    #[validate(
+        length(min = 1, message = "Old password is required."),
+        length(min = 6, message = "Old password must be at least 6 characters")
+    )]
+    pub old_password: String,
 }
