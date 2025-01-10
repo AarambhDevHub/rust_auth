@@ -2,12 +2,7 @@ use actix_web::{web, HttpResponse, Scope};
 use validator::Validate;
 
 use crate::{
-    auth::{Authenticated, RequireAuth}, 
-    db::UserExt, 
-    dtos::{FilterUserDto, RequestQueryDto, UserData, UserListResponseDto, UserResponseDto}, 
-    error::HttpError, 
-    AppState,
-    models::UserRole,
+    auth::{Authenticated, RequireAuth}, db::UserExt, dtos::{FilterUserDto, RequestQueryDto, Response, UserData, UserListResponseDto, UserResponseDto}, error::HttpError, models::UserRole, AppState
 };
 
 pub fn users_handler() -> Scope {
@@ -28,14 +23,22 @@ pub fn users_handler() -> Scope {
         )
 }
 
+
 #[utoipa::path(
     get,
     path = "/api/users/me",
     tag = "Get Authenticated User Endpoint",
     responses(
-        (status = 200, description= "Authenticated User", body = UserResponseDto),
-        (status= 500, description= "Internal Server Error", body = Response )
-       
+        (
+            status = 200, 
+            description= "Authenticated User", 
+            body = UserResponseDto
+        ),
+        (
+            status= 500, 
+            description= "Internal Server Error", 
+            body = Response
+        )       
     ),
     security(
        ("token" = [])
@@ -63,10 +66,26 @@ pub async fn get_me(user: Authenticated) -> Result<HttpResponse, HttpError> {
         RequestQueryDto
     ),
     responses(
-        (status = 200, description= "All Users", body = [UserResponseDto]),
-        (status=401, description= "Authentication Error", body= Response),
-        (status=403, description= "Permission Denied Error", body= Response),
-        (status= 500, description= "Internal Server Error", body = Response )
+        (
+            status = 200, 
+            description= "All Users", 
+            body = [UserResponseDto]
+        ),
+        (
+            status = 401, 
+            description= "Authentication Error", 
+            body= Response
+        ),
+        (
+            status = 403, 
+                description= "Permission Denied Error", 
+            body= Response
+        ),
+        (
+            status = 500, 
+            description= "Internal Server Error", 
+            body = Response 
+        )
        
     ),
     security(
@@ -81,7 +100,7 @@ pub async fn get_users(
 
     query_params
         .validate()
-        .map_err(|e| HttpError::bat_request(e.to_string()))?;
+        .map_err(|e| HttpError::bad_request(e.to_string()))?;
 
     let page = query_params.page.unwrap_or(1);
     let limit = query_params.limit.unwrap_or(10);

@@ -20,14 +20,10 @@ pub trait UserExt {
         &self,
         user_id: Option<Uuid>,
         name: Option<&str>,
-        email: Option<&str>
+        email: Option<&str>,
     ) -> Result<Option<User>, sqlx::Error>;
 
-    async fn get_users(
-        &self,
-        page: u32,
-        limit: usize,
-    ) -> Result<Vec<User>, sqlx::Error>;
+    async fn get_users(&self, page: u32, limit: usize) -> Result<Vec<User>, sqlx::Error>;
 
     async fn save_user<T: Into<String> + Send>(
         &self,
@@ -50,7 +46,7 @@ impl UserExt for DBClient {
         &self,
         user_id: Option<Uuid>,
         name: Option<&str>,
-        email: Option<&str>
+        email: Option<&str>,
     ) -> Result<Option<User>, sqlx::Error> {
         let mut user: Option<User> = None;
 
@@ -60,7 +56,7 @@ impl UserExt for DBClient {
                 r#"SELECT id, name, email, password, photo, verified, created_at, updated_at, role as "role: UserRole" FROM users WHERE id = $1"#,
                 user_id
             ).fetch_optional(&self.pool).await?;
-        }else if let Some(name) = name {
+        } else if let Some(name) = name {
             user = sqlx::query_as!(
                 User,
                 r#"SELECT id, name, email, password, photo, verified, created_at, updated_at, role as "role: UserRole" FROM users WHERE name = $1"#,

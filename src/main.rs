@@ -1,11 +1,11 @@
-mod models;
+mod auth;
 mod config;
+mod db;
 mod dtos;
 mod error;
-mod utils;
-mod db;
-mod auth;
 mod handler;
+mod models;
+mod utils;
 
 use actix_cors::Cors;
 use actix_web::{
@@ -41,11 +41,20 @@ pub struct AppState {
         authHandler::login,authHandler::logout,authHandler::register, users::get_me, users::get_users, heath_checker_handler
     ),
     components(
-        schemas(UserData,FilterUserDto,LoginUserDto,RegisterUserDto,UserResponseDto,UserLoginResponseDto,Response,UserListResponseDto)
+        schemas(
+        UserData,
+        FilterUserDto,
+        LoginUserDto,
+        RegisterUserDto,
+        UserResponseDto,
+        UserLoginResponseDto,
+        Response,
+        UserListResponseDto)
     ),
     tags(
         (name = "Rust Authentication Api", description = "Authentication in Rust API")
-    )
+    ),
+    modifiers(&SecurityAddon)
 )]
 struct ApiDoc;
 
@@ -53,15 +62,18 @@ struct SecurityAddon;
 
 impl Modify for SecurityAddon {
     fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-        let components = openapi.components.as_mut().unwrap();
-        components.add_security_scheme(
-            "token", 
-            SecurityScheme::Http(
-                HttpBuilder::new()
-                .scheme(HttpAuthScheme::Bearer)
-                .bearer_format("JWT")
+        openapi.components = Some(
+            utoipa::openapi::ComponentsBuilder::new()
+                .security_scheme(
+                    "token",
+                    SecurityScheme::Http(
+                        HttpBuilder::new()
+                            .scheme(HttpAuthScheme::Bearer)
+                            .bearer_format("JWT")
+                            .build(),
+                    ),
+                )
                 .build(),
-            )
         )
     }
 }
@@ -89,9 +101,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let db_client = DBClient::new(pool);
-    let app_state = AppState { 
-        env: config.clone(), 
-        db_client 
+    let app_state = AppState {
+        env: config.clone(),
+        db_client,
     };
 
     println!(
@@ -103,15 +115,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     HttpServer::new(move || {
         let cors = Cors::default()
-                    .allowed_origin("http://localhost:3000")
-                    .allowed_origin("http://localhost:8000")
-                    .allowed_methods(vec!["GET", "POST"])
-                    .allowed_headers(vec![
-                        header::CONTENT_TYPE,
-                        header::AUTHORIZATION,
-                        header::ACCEPT,
-                    ])
-                    .supports_credentials();
+            .allowed_origin("http://localhost:3000")
+            .allowed_origin("http://localhost:8000")
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec![
+                header::CONTENT_TYPE,
+                header::AUTHORIZATION,
+                header::ACCEPT,
+            ])
+            .supports_credentials();
 
         App::new()
             .app_data(web::Data::new(app_state.clone()))
@@ -136,7 +148,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     path = "/api/healthchecker",
     tag = "Health Checker Endpoint",
     responses(
-        (status = 200, description= "Authenticated User", body = Response),       
+        (
+            status = 200,
+            description= "Authenticated User",
+            body=Response
+        ),       
     )
 )]
 #[get("/api/healthchecker")]

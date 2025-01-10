@@ -5,16 +5,7 @@ use serde_json::json;
 use validator::Validate;
 
 use crate::{
-    db::UserExt,
-    dtos::{
-        FilterUserDto, LoginUserDto, RegisterUserDto, UserData, UserLoginResponseDto,
-        UserResponseDto,
-    },
-    error::{ErrorMessage, HttpError},
-    auth::RequireAuth,
-    models::UserRole,
-    utils::{password, token},
-    AppState,
+    auth::RequireAuth, db::UserExt, dtos::{FilterUserDto, LoginUserDto, RegisterUserDto, Response, UserData, UserLoginResponseDto, UserResponseDto}, error::{ErrorMessage, HttpError}, models::UserRole, utils::{password, token}, AppState
 };
 
 pub fn auth_handler() -> Scope {
@@ -35,12 +26,37 @@ pub fn auth_handler() -> Scope {
     post,
     path = "/api/auth/register",
     tag = "Register Account Endpoint",
-    request_body(content = RegisterUserDto, description = "Credentials to create account", example = json!({"email": "johndoe@example.com","name": "John Doe","password": "password123","passwordConfirm": "password123"})),
+    request_body(
+        content = RegisterUserDto,
+        description = "Credentials to create account",
+        example = json!(
+            {
+                "email": "johndoe@example.com",
+                "name": "John Doe",
+                "password": "password123",
+                "passwordConfirm": "password123"
+            })),
     responses(
-        (status=201, description= "Account created successfully", body= UserResponseDto ),
-        (status=400, description= "Validation Errors", body= Response),
-        (status=409, description= "User with email already exists", body= Response),
-        (status=500, description= "Internal Server Error", body= Response ),
+        (
+            status=201, 
+            description= "Account created successfully", 
+            body= UserResponseDto 
+        ),
+        (
+            status=400, 
+            description= "Validation Errors", 
+            body= Response
+        ),
+        (
+            status=409, 
+            description= "User with email already exists", 
+            body= Response
+        ),
+        (
+            status=500, 
+            description= "Internal Server Error", 
+            body= Response 
+        ),
     )
 )]
 pub async fn register(
@@ -48,7 +64,7 @@ pub async fn register(
     body: web::Json<RegisterUserDto>,
 ) -> Result<HttpResponse, HttpError> {
     body.validate()
-        .map_err(|e| HttpError::bat_request(e.to_string()))?;
+        .map_err(|e| HttpError::bad_request(e.to_string()))?;
 
     let hashed_password = 
         password::hash(&body.password).map_err(|e| HttpError::server_error(e.to_string()))?;
@@ -78,15 +94,35 @@ pub async fn register(
     }
 }
 
+
 #[utoipa::path(
     post,
     path = "/api/auth/login",
     tag = "Login Endpoint",
-    request_body(content = LoginUserDto, description = "Credentials to log in to your account", example = json!({"email": "johndoe@example.com","password": "password123"})),
+    request_body(
+        content = LoginUserDto, 
+        description = "Credentials to log in to your account", 
+        example = json!(
+            {
+                "email": "johndoe@example.com",
+                "password": "password123"
+            })),
     responses(
-        (status=200, description= "Login successfull", body= UserLoginResponseDto ),
-        (status=400, description= "Validation Errors", body= Response ),
-        (status=500, description= "Internal Server Error", body= Response ),
+        (
+            status = 200, 
+            description = "Login successfull", 
+            body= UserLoginResponseDto 
+        ),
+        (
+            status=400, 
+            description= "Validation Errors", 
+            body= Response
+        ),
+        (
+            status=500, 
+            description= "Internal Server Error", 
+            body= Response
+        ),
     )
 )]
 pub async fn login(
@@ -94,7 +130,7 @@ pub async fn login(
     body: web::Json<LoginUserDto>,
 ) -> Result<HttpResponse, HttpError> {
     body.validate()
-       .map_err(|e| HttpError::bat_request(e.to_string()))?;
+       .map_err(|e| HttpError::bad_request(e.to_string()))?;
 
     let result = app_state
                     .db_client
@@ -131,15 +167,31 @@ pub async fn login(
     }
 }
 
+
 #[utoipa::path(
     post,
     path = "/api/auth/logout",
     tag = "Logout Endpoint",
     responses(
-        (status=200, description= "Logout successfull" ),
-        (status=400, description= "Validation Errors", body= Response ),
-        (status=401, description= "Unauthorize Error", body= Response),
-        (status=500, description= "Internal Server Error", body= Response ),
+        (
+            status=200, 
+            description= "Logout successfull"
+        ),
+        (
+            status=400, 
+            description= "Validation Errors", 
+            body= Response 
+        ),
+        (
+            status=401, 
+            description= "Unauthorize Error", 
+            body= Response
+        ),
+        (
+            status=500, 
+            description= "Internal Server Error", 
+            body= Response
+        ),
     ),
     security(
        ("token" = [])
